@@ -289,6 +289,8 @@ for z = 1:numFiles
     
 end
 
+clear x y z indexes boundaries binaryImage midX midY
+
 toc
 
 end

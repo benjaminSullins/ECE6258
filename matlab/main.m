@@ -285,27 +285,27 @@ for z = 1:numFiles
 %     hold off;
 
     % Plotting assistance for viewing the finger locations on the figure.
-%     figure, imshow(binaryImage, []);
-%     hold on;
-%     plot(x(peakIndexes), y(peakIndexes), 'r^');
-%     plot(x(valleyIndexes), y(valleyIndexes), 'go')
-%     hold off;
-% 
-%     % This code can be used for construction the hull of the image. Think of it
-%     % as the boundaries of the image only using the maximum difference
-%     % locations. You can also plot the image if it helps make sense
-%     indexes = convhull(x, y);
-%     hold on; 
-%     plot(x(indexes), y(indexes), 'm-', 'LineWidth', 2);
-%     for k = 1 : length(peakIndexes)
-%         line([x(peakIndexes(k)), wristX], [y(peakIndexes(k)),wristY ], 'Color', 'r', 'LineWidth', 2);
-%     end
-%     hold off;
+    figure, imshow(binaryImage, []);
+    hold on;
+    plot(x(peakIndexes), y(peakIndexes), 'r^');
+    plot(x(valleyIndexes), y(valleyIndexes), 'go')
+    hold off;
+
+    % This code can be used for construction the hull of the image. Think of it
+    % as the boundaries of the image only using the maximum difference
+    % locations. You can also plot the image if it helps make sense
+    indexes = convhull(x, y);
+    hold on; 
+    plot(x(indexes), y(indexes), 'm-', 'LineWidth', 2);
+    for k = 1 : length(peakIndexes)
+        line([x(peakIndexes(k)), wristX], [y(peakIndexes(k)),wristY ], 'Color', 'r', 'LineWidth', 2);
+    end
+    hold off;
     
     % Store the Finger points as a descriptor
-    imageFingers{1}{z} = size(peak);
-    imageFingers{2}{z} = peak;
-    imageFingers{3}{z} = peakIndexes;
+    imageFingers{1}{z} = size(peak);    % How many fingers are there?
+    imageFingers{2}{z} = peak;          % Those finger values
+    imageFingers{3}{z} = peakIndexes;   % Those finger positions
     
 end
 
@@ -347,14 +347,14 @@ for z = 1:numFiles
     % This code can be used for construction the hull of the image. Think of it
     % as the boundaries of the image only using the maximum difference
     % locations. You can also plot the image if it helps make sense
-    figure, imshow(binaryImage, []);
-    hold on; 
-    plot(x(indexes), y(indexes), 'm-', 'LineWidth', 2);
-    for k = 1 : length(imageWidth)
-        line([max(x(indexes)), min(x(indexes))], [midY, midY ], 'Color', 'r', 'LineWidth', 2);
-        line([midX, midX ], [max(y(indexes)), min(y(indexes))], 'Color', 'r', 'LineWidth', 2);
-    end
-    hold off;
+%     figure, imshow(binaryImage, []);
+%     hold on; 
+%     plot(x(indexes), y(indexes), 'm-', 'LineWidth', 2);
+%     for k = 1 : length(imageWidth)
+%         line([max(x(indexes)), min(x(indexes))], [midY, midY ], 'Color', 'r', 'LineWidth', 2);
+%         line([midX, midX ], [max(y(indexes)), min(y(indexes))], 'Color', 'r', 'LineWidth', 2);
+%     end
+%     hold off;
     
 end
 
@@ -365,15 +365,157 @@ toc
 %% K Means Clustering Algorithm
 % With all of the key descriptors calculated, the keys can be used to build
 % a function describing the discrepencies between the signs.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% References:
+% https://www.mathworks.com/help/stats/kmeans.html
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+close all;
+disp('K Means Clustering');
+tic
 
 % Plot the Orientation vs the Eccentricity
+% figure;
+% plot( imageOrientation, imageEccentricity,'k*','MarkerSize',5);
+
+% Plot the Length vs. Width
+% figure;
+% plot( imageWidth, imageLength,'k*','MarkerSize',5);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Trying to do K Means on Length and Width
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+X = [ imageWidth' imageLength'];
+
+% Find the predicted and actual centroid locations
+opts = statset('Display','final');
+[idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
+    'Replicates',5,'Options',opts);
+
+% Defines a fine grid on the plot
+x1 = min(X(:,1)):0.1:max(X(:,1));
+x2 = min(X(:,2)):0.1:max(X(:,2));
+[x1G,x2G] = meshgrid(x1,x2);
+XGrid = [x1G(:),x2G(:)];
+
+idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
+
+% Assigns each node in the grid to the closest centroid    
 figure;
-plot( imageOrientation, imageEccentricity,'k*','MarkerSize',5);
+gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
+    [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+hold on;
+plot(X(:,1),X(:,2),'k*','MarkerSize',5);
+title 'Width vs. Length';
+xlabel 'Width (pixels)';
+ylabel 'Length (pixels)';
+legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+hold off;
 
-% Plot the 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Trying to do K Means on Orientation and Eccentricity
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+X = [ imageOrientation' imageEccentricity' ];
+
+% Find the predicted and actual centroid locations
+opts = statset('Display','final');
+[idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
+    'Replicates',5,'Options',opts);
+
+% Defines a fine grid on the plot
+x1 = min(X(:,1)):0.001:max(X(:,1));
+x2 = min(X(:,2)):0.001:max(X(:,2));
+[x1G,x2G] = meshgrid(x1,x2);
+XGrid = [x1G(:),x2G(:)];
+
+idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
+
+% Assigns each node in the grid to the closest centroid    
 figure;
-plot( imageWidth, imageLength,'k*','MarkerSize',5);
+gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
+    [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+hold on;
+plot(X(:,1),X(:,2),'k*','MarkerSize',5);
+title 'Orientation vs. Eccentricity';
+xlabel 'Orientation';
+ylabel 'Eccentricity';
+legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+hold off;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% If we are given an input, how do we classify the image based on our key
+% Descriptors?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Generate our training vector list
+numVectors = 2;
+trainingVector = zeros(numFiles, numVectors*2);
 
+for i = 1:numFiles
+    trainingVector(i, 1) = imageOrientation(i);
+    trainingVector(i, 2) = imageEccentricity(i);
+    trainingVector(i, 3) = imageLength(i);
+    trainingVector(i, 4) = imageWidth(i);
+end
 
+% Compute the feature vectors for all of the training images
+trainingFeatureVector = zeros(1,numVectors,numFiles);
+
+for i = 1:numFiles
+    % For each vector
+   for j = 1:numVectors
+      
+       % Compute the distance from each centroid in the k-means clustering
+       % algorithms. Here, X(1,:) represents the new sign.
+       D = pdist2( [trainingVector(i,j*2-1) trainingVector(i,j*2)], C, 'euclidean');
+
+       % The minimum distance represents the most likely group that the signal
+       % belongs to.
+       group = find( D == min(D) );
+       
+       trainingFeatureVector(1,j,i) = group;
+       
+   end
+end
+
+% Compute the feature vector for the input image
+featureVector = zeros(1,numVectors);
+
+for i = 1:numVectors
+    
+    % Compute the distance from each centroid in the k-means clustering
+    % algorithms. Here, X(1,:) represents the new sign.
+    D = pdist2(X(1,:), C, 'euclidean');
+
+    % The minimum distance represents the most likely group that the signal
+    % belongs to.
+    group = find( D == min(D) );
+
+    % This group identifies what the key descriptor is tellings us what the
+    % object is. This is added to the feature vector.
+    featureVector(i) = group;
+
+end
+
+% Now that we have all of the feature vectors established for the input
+% image, we can correlate this with the feature vectors of the trained
+% images to see what we are most likely looking at.
+
+currentCorrMax = 0;
+sign = 9999;
+
+for i = 1:numFiles
+    
+    correlation = xcorr( featureVector, trainingFeatureVector(:,:,i) );
+    
+    % Find the maximum correlation value
+    correlation = max( correlation(:) );
+    
+    if correlation > currentCorrMax
+        sign = i;
+    end
+end
+
+% The input image has been found based on it's correlation with the
+% training image feature vectors.
+
+toc;
