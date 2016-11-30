@@ -57,6 +57,7 @@ handles.output = hObject;
 handles.datavalid = 0;
 handles.data2valid = 0;
 handles.extracted =0;
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -80,13 +81,24 @@ function uploadsign_Callback(hObject, eventdata, handles)
 % hObject    handle to uploadsign (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles=guidata(hObject);
-[handles.file,handles.path] = uigetfile({'*.jpg';'*.tif';'*.*'}, 'Select a file from the directory');
-handles.img = imread([handles.path,handles.file]);
+handles = guidata(hObject);
+
+% Open a dialog box
+[handles.file,handles.path] = uigetfile({'*.jpg';'*.tif';'*.*'}, 'Select a file from the directory', '../images/');
+
+% Read the input image
+handles.img = imread([handles.path, handles.file]);
+
+% Modify the image
 axes(handles.axes2);
 imshow(handles.img);
+
 handles.key = 1;
-[handles.imageop handles.data2valid] = preprocessing( handles.path,handles.file,handles.key);
+
+% Pre-Processing
+[handles.imageop handles.data2valid] = preprocessing( handles.path, handles.file, handles.key);
+
+% Complete
 guidata(hObject, handles);
 
 % --- Executes on button press in classify.
@@ -96,21 +108,34 @@ function classify_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 %%Classify
 handles=guidata(hObject);
+
 if handles.data2valid~=0
-    [ Orientation, Eccentricity,Fingers,Width,Length] = descriptor_calc(handles. imagestack );
-    handles.thisx= [ Orientation, Eccentricity,Fingers,Width,Length];
-    %set(handles.text100,'string',Orientation);
-    %set(handles.text100,'string',Eccentricity);
-    %set(handles.text100,'string',Fingers);
-    %set(handles.text100,'string',Width);
-    %set(handles.text100,'string',Length);
-    %alternatively get method for parameters
-    handles.label = classify( handles.thisx , handles.to, handles.t1);
+    [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles] = descriptor_calc( handles.imageop );
+    handles.thisx = [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles];
+    
+    % Compute the number of descriptor features.
+    % NOTE: Overwrite existing for debugging
+    numVectors = max(size(handles.thisx)) / 2;
+    numVectors = 2;
+    
+    % Update the GUI
+    set(handles.textOrientation,'string',Orientation);
+    set(handles.textEccentricity,'string',Eccentricity);
+    %set(handles.textFingers,'string',Fingers);
+    set(handles.textWidth,'string',Width);
+    set(handles.textLength,'string',Length);
+    
+    % Attempt to classify the input sign
+    handles.label = classify( numVectors, handles.trainingFeatureVector, handles.C, handles.thisx ); % , handles.to, handles.t1);
+    
+    % Update the Output Image
+    handles.img = getImage( '../imagesPristine/', handles.label );
+    axes(handles.axes7);
+    imshow(handles.img);
+    
 else
     warndlg('Error:No files uploaded')
 end
-
-%set(handles.text100,'string',label);
 
 % --- Executes on button press in loadimage.
 function loadimage_Callback(hObject, eventdata, handles)
@@ -127,8 +152,8 @@ handles.filename = 0;
 handles.key = 0;
 
 [handles.imagestack handles.datavalid] = preprocessing( directory,handles.filename,handles.key);
-% [ imageOrientation, imageEccentricity,imageFingers,imageWidth,imageLength] = descriptor_calc(handles. imagestack );
-% x= [imageOrientation, imageEccentricity,imageFingers,imageWidth,imageLength];
+% [ trainingFeatureVector, imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles] = descriptor_calc(handles. imagestack );
+% x= [imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles];
 %train x
 %classify x
 
@@ -165,11 +190,12 @@ function train_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 %train handles.x is feature vector
+
 if handles.datavalid~=0 && handles.extracted ~=0
-handles=guidata(hObject);
-[to t1] = training(handles.x);
-handles.to =to;
-handles.t1 = t1;
+    handles = guidata(hObject);
+    [to t1] = training(handles.x);
+    handles.to = to;
+    handles.t1 = t1;
 elseif handles.datavalid == 0
     warndlg('Error:No files uploaded')
 elseif handles.extracted ==0
@@ -184,11 +210,22 @@ function extractfeatures_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 handles=guidata(hObject);
+
 if handles.datavalid~=0
-[ imageOrientation, imageEccentricity,imageFingers,imageWidth,imageLength] = descriptor_calc(handles. imagestack );
-handles.x= [imageOrientation, imageEccentricity,imageFingers,imageWidth,imageLength];
-handles.extracted =1;
-%plot ecentricity ish?
+    % Compute the training feature vectors
+    [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles] = descriptor_calc( handles.imagestack );
+    handles.x = [imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles];
+    
+    % Override the NUmber of feature vectors
+    numVectors = max(size(handles.x)) / 2;
+    numVectors = 2;
+
+    [ handles.C ] = computeKMeansClusters( numVectors, handles.x );
+    [ handles.trainingFeatureVector ] = computeTrainingVector(  numVectors, handles.C, handles.x );
+    
+    handles.extracted = 1;
+    
+    %plot ecentricity ish?
 else
    warndlg('Error:No file uploaded') 
 end

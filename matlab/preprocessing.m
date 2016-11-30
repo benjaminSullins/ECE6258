@@ -1,10 +1,11 @@
-function [ imageStack,check ] = preprocessing( filePath,filename,key)
+function [ imageStack,check ] = preprocessing( filePath, filename, key )
 %UNTITLED10 Summary of this function goes here
 %   Detailed explanation goes here
 %key = 0 Training phase, load multiple images
 %key = 1 Testing phase, load single image
 %% Import Training Images
 disp('Importing Training Images');
+
 % filePath = '../images/';
 files = dir(filePath);
 [numFiles null] = size(files);
@@ -16,17 +17,19 @@ imagePaddSize = [200 200];
 
 % Read out all the files. The first few inputs are not files, so we offset
 % to number 3 instead.
-offset =3;
+offset = 3;
 check = numFiles;
+
 %Read single image
 if key ==1
-    if filename ~=0
-        numFiles =1;
+    if filename ~= 0
+        numFiles = 1;
     else
         check =0;
     end
+    
     offset =1;
-    files(1).name =filename;
+    files(1).name = filename;
 end
 
 imageStack = zeros(imagePaddSize(1),imagePaddSize(2),numFiles-offset+1);

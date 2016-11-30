@@ -284,23 +284,23 @@ for z = 1:numFiles
 %     plot(valleyIndexes, valley, 'go')
 %     hold off;
 
-    % Plotting assistance for viewing the finger locations on the figure.
-    figure, imshow(binaryImage, []);
-    hold on;
-    plot(x(peakIndexes), y(peakIndexes), 'r^');
-    plot(x(valleyIndexes), y(valleyIndexes), 'go')
-    hold off;
-
-    % This code can be used for construction the hull of the image. Think of it
-    % as the boundaries of the image only using the maximum difference
-    % locations. You can also plot the image if it helps make sense
-    indexes = convhull(x, y);
-    hold on; 
-    plot(x(indexes), y(indexes), 'm-', 'LineWidth', 2);
-    for k = 1 : length(peakIndexes)
-        line([x(peakIndexes(k)), wristX], [y(peakIndexes(k)),wristY ], 'Color', 'r', 'LineWidth', 2);
-    end
-    hold off;
+%     % Plotting assistance for viewing the finger locations on the figure.
+%     figure, imshow(binaryImage, []);
+%     hold on;
+%     plot(x(peakIndexes), y(peakIndexes), 'r^');
+%     plot(x(valleyIndexes), y(valleyIndexes), 'go')
+%     hold off;
+% 
+%     % This code can be used for construction the hull of the image. Think of it
+%     % as the boundaries of the image only using the maximum difference
+%     % locations. You can also plot the image if it helps make sense
+%     indexes = convhull(x, y);
+%     hold on; 
+%     plot(x(indexes), y(indexes), 'm-', 'LineWidth', 2);
+%     for k = 1 : length(peakIndexes)
+%         line([x(peakIndexes(k)), wristX], [y(peakIndexes(k)),wristY ], 'Color', 'r', 'LineWidth', 2);
+%     end
+%     hold off;
     
     % Store the Finger points as a descriptor
     imageFingers{1}{z} = size(peak);    % How many fingers are there?
@@ -477,7 +477,8 @@ for i = 1:numFiles
    end
 end
 
-% Compute the feature vector for the input image
+% Compute the feature vector for the input image.
+% This is were we begin classifying the images amongst the training images
 featureVector = zeros(1,numVectors);
 
 for i = 1:numVectors
@@ -499,23 +500,38 @@ end
 % Now that we have all of the feature vectors established for the input
 % image, we can correlate this with the feature vectors of the trained
 % images to see what we are most likely looking at.
+% We determine what the sign is by correlating the group descriptors of the
+% sign with the expected results of the training images. This reduces the
+% overhead from a direct convolution while also trying to find the exact
+% match.
 
 currentCorrMax = 0;
 sign = 9999;
+corrPlot = zeros(1,numFiles);
 
 for i = 1:numFiles
     
-    correlation = xcorr( featureVector, trainingFeatureVector(:,:,i) );
+    correlation = xcorr( featureVector, trainingFeatureVector(:,:,i), 'coeff' );
     
-    % Find the maximum correlation value
-    correlation = max( correlation(:) );
+    % Find the correlation value at the central location of the feature
+    % vector array.
+    correlation = correlation(numVectors);
     
+    % For debugging purposes, we plot the correlation amongst the multitude
+    % of signs.
+    corrPlot(i) = correlation;
+    
+    % Check if the current sign is more likely to be the match
     if correlation > currentCorrMax
-        sign = i;
+        currentCorrMax  = correlation;
+        sign            = i;
     end
 end
 
+% Plot the correlation
+figure;
+plot( corrPlot,'k*','MarkerSize',5);
+
 % The input image has been found based on it's correlation with the
 % training image feature vectors.
-
 toc;

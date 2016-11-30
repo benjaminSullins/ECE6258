@@ -2,3 +2,11 @@
 matlab/main.asv
 
 docs/~$System Implementation.pptx
+
+matlab/Sign_LanguageTranslator.asv
+
+matlab/classify.asv
+
+matlab/computeTrainingVector.asv
+
+matlab/descriptor_calc.asv

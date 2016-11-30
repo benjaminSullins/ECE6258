@@ -1,4 +1,4 @@
-function [ imageOrientation, imageEccentricity,imageFingers,imageWidth,imageLength] = descriptor_calc( imageStack )
+function [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles] = descriptor_calc( imageStack )
 %UNTITLED11 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -103,8 +103,9 @@ end
 % boundary. We locate the wrist and measure the distances from the wrist to
 % the boundary locations of the hand. Plotting this allows us to see where
 % the finger locations are and help describe what the hand looks like.
-% Analysis has shown that it might be better to use the fingertip peaks and
-% not the valleys due to the errors.
+% Analysis has shown that it might be better to use the number of
+% fingertips and the number of knuckles. Fingertips have high standard
+% deviations from the mean while the knuckles will be closer to the mean.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % References:
 % http://www.mathworks.com/matlabcentral/answers/215225-can-we-plot-the-boundary-of-an-image
@@ -140,10 +141,45 @@ for z = 1:numFiles
     % Compute the distances from the central wrist location to the boundary
     % locations along the contour.
     distance = sqrt( (x - wristX).^2 + (y - wristY).^2 );
+    
+    % Attempting to find the fingertips through a search method across the
+    % boundary for large curvature spikes.
+    % Reference:
+    % https://www.mathworks.com/matlabcentral/newsreader/view_thread/152405
+    %
+%     offset = 12;
+%     threshold = 0.5;
+%     
+%     for l = 1 + offset:max(size(x)) - offset
+%         xbounds = [1 2 3]; 
+%         ybounds = [distance(l - 1) distance(l) distance(l + 1)];
+%         
+%         mx 	= mean(xbounds); 
+%         my  = mean(ybounds);
+%         
+%         X = xbounds - mx; 
+%         Y = ybounds - my; % Get differences from means
+%         
+%         dx2 = mean(X.^2); 
+%         dy2 = mean(Y.^2); % Get variances
+%         
+%         t = [X,Y]\(X.^2-dx2+Y.^2-dy2)/2;    % Solve least mean squares problem
+%         a0 = t(1); b0 = t(2);               % t is the 2 x 1 solution array [a0;b0]
+%         r = sqrt(dx2+dy2+a0^2+b0^2);        % Calculate the radius
+%         a = a0 + mx; b = b0 + my;           % Locate the circle's center
+%         curv(l - offset) = 1/r;                         % Get the curvature
+%         
+%         % Threshold Curvature
+%         if curv < threshold
+%             peakX = [peakX x(l)];
+%             peakY = [peakY y(l)];
+%         end
+%         
+%     end
 
     % Now we find the maximum and minimum positions. These will be used to
     % determine if the finger is extended or not.
-    [ peak peakIndexes ]        = findpeaks(distance);
+    [ peak peakIndexes ]        = findpeaks(distance, 'MinPeakHeight', 60);
     [ valley valleyIndexes ]    = findpeaks(max(distance) - distance);
     valley = max(valley) - valley;
 
@@ -208,35 +244,42 @@ for z = 1:numFiles
     valleyIndexes   = valleyIndexes(find( valley > 0 ));
     valley          = valley(find( valley > 0 ));
 
-    % Plotting assistance for viewing the finger distances.
+% %     % Plotting assistance for viewing the finger distances.
 %     figure; plot(distance);
 %     hold on;
 %     plot(peakIndexes, peak, 'r^');
 %     plot(valleyIndexes, valley, 'go')
 %     hold off;
+%     
+%     figure;
+%     plot(curv);
 
-    % Plotting assistance for viewing the finger locations on the figure.
-%     figure, imshow(binaryImage, []);
-%     hold on;
-%     plot(x(peakIndexes), y(peakIndexes), 'r^');
-%     plot(x(valleyIndexes), y(valleyIndexes), 'go')
-%     hold off;
-% 
-%     % This code can be used for construction the hull of the image. Think of it
-%     % as the boundaries of the image only using the maximum difference
-%     % locations. You can also plot the image if it helps make sense
-%     indexes = convhull(x, y);
-%     hold on; 
-%     plot(x(indexes), y(indexes), 'm-', 'LineWidth', 2);
-%     for k = 1 : length(peakIndexes)
-%         line([x(peakIndexes(k)), wristX], [y(peakIndexes(k)),wristY ], 'Color', 'r', 'LineWidth', 2);
-%     end
-%     hold off;
+% %     Plotting assistance for viewing the finger locations on the figure.
+% %     figure, imshow(binaryImage, []);
+% %     hold on;
+% %     plot(x(peakIndexes), y(peakIndexes), 'r^');
+% %     plot(x(valleyIndexes), y(valleyIndexes), 'go')
+% %     hold off;
+% % 
+% %     This code can be used for construction the hull of the image. Think of it
+% %     as the boundaries of the image only using the maximum difference
+% %     locations. You can also plot the image if it helps make sense
+% %     indexes = convhull(x, y);
+% %     hold on; 
+% %     plot(x(indexes), y(indexes), 'm-', 'LineWidth', 2);
+% %     for k = 1 : length(peakIndexes)
+% %         line([x(peakIndexes(k)), wristX], [y(peakIndexes(k)),wristY ], 'Color', 'r', 'LineWidth', 2);
+% %     end
+% %     hold off;
     
     % Store the Finger points as a descriptor
-    imageFingers{1}{z} = size(peak);
-    imageFingers{2}{z} = peak;
-    imageFingers{3}{z} = peakIndexes;
+    imageFingers{1}{z} = max(size(peak));
+    %imageFingers{2}{z} = peak;
+    %imageFingers{3}{z} = peakIndexes;
+    
+    imageKnuckles{1}{z} = max(size(valley));
+    %imageKnuckles{2}{z} = valley;
+    %imageKnuckles{3}{z} = valleyIndexes;
     
 end
 
