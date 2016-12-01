@@ -10,3 +10,5 @@ matlab/classify.asv
 matlab/computeTrainingVector.asv
 
 matlab/descriptor_calc.asv
+
+matlab/computeKMeansClusters.asv

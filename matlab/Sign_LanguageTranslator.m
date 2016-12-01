@@ -110,13 +110,19 @@ function classify_Callback(hObject, eventdata, handles)
 handles=guidata(hObject);
 
 if handles.data2valid~=0
-    [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles] = descriptor_calc( handles.imageop );
-    handles.thisx = [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles];
-    
+    %[ Orientation, Eccentricity, Width, Length, Fingers, Knuckles] = descriptor_calc( handles.imageop );
+    %handles.thisx = [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles];
+ [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( handles.imageop);
+    %handles.thisx =[ Orientation, Eccentricity, Width, Length, Fingers, Knuckles,real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), Fingers, Knuckles];
+    handles.thisx =[ real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), Fingers, Knuckles];
+
+
     % Compute the number of descriptor features.
     % NOTE: Overwrite existing for debugging
     numVectors = max(size(handles.thisx)) / 2;
-    numVectors = 2;
+    %numVectors = 2;
+    %numVectors = 8;
+    numVectors = 5;
     
     % Update the GUI
     set(handles.textOrientation,'string',Orientation);
@@ -152,36 +158,7 @@ handles.filename = 0;
 handles.key = 0;
 
 [handles.imagestack handles.datavalid] = preprocessing( directory,handles.filename,handles.key);
-% [ trainingFeatureVector, imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles] = descriptor_calc(handles. imagestack );
-% x= [imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles];
-%train x
-%classify x
 
-% if handles.filename == 0
-%     handles.datavalid =1;
-% else
-%     handles.datavalid =0;
-%     handles.img = imread([handles.pathname,handles.filename]);
-% end
-% axes(handles.axes1);
-% imshow(handles.img);
-
-
- 
-% [File, Folder] = uigetfile('*.*', 'MultiSelect', 'on');
-% 
-% handles.img = cell(1, length(File));
-% handles.axes = cell(1, length(File));
-% for iFile = 1:length(File)
-%     filename = fullfile(Folder, File{iFile});
-%     image = imread(filename);
-% %      axes(handles.axes(iFile));  
-% %      imshow(image);
-%     handles.img{iFile} = image;
-% end
-%  axes(handles.axes1);
-%  imshow(handles.img{1});  
-% main
   guidata(hObject, handles);
 
 % --- Executes on button press in train.
@@ -192,10 +169,10 @@ function train_Callback(hObject, eventdata, handles)
 %train handles.x is feature vector
 
 if handles.datavalid~=0 && handles.extracted ~=0
-    handles = guidata(hObject);
-    [to t1] = training(handles.x);
-    handles.to = to;
-    handles.t1 = t1;
+%     handles = guidata(hObject);
+%     [to t1] = training(handles.x);
+%     handles.to = to;
+%     handles.t1 = t1;
 elseif handles.datavalid == 0
     warndlg('Error:No files uploaded')
 elseif handles.extracted ==0
@@ -213,15 +190,36 @@ handles=guidata(hObject);
 
 if handles.datavalid~=0
     % Compute the training feature vectors
-    [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles] = descriptor_calc( handles.imagestack );
-    handles.x = [imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles];
+    %[ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles] = descriptor_calc( handles.imagestack );
+    %handles.x = [imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles];
+    [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( handles.imagestack );
+   % handles.x =[ imageOrientation, imageEccentricity, imageWidth, imageLength,real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
+    handles.x =[ real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
+
     
     % Override the NUmber of feature vectors
     numVectors = max(size(handles.x)) / 2;
-    numVectors = 2;
+    %numVectors = 2;
+    %numVectors = 8;
+    numVectors = 5;
 
-    [ handles.C ] = computeKMeansClusters( numVectors, handles.x );
+    [ handles.C , handles.XGrid,handles.idx2Region,handles.X] = computeKMeansClusters( numVectors, handles.x );
     [ handles.trainingFeatureVector ] = computeTrainingVector(  numVectors, handles.C, handles.x );
+    
+
+    % Assigns each node in the grid to the closest centroid    
+    
+    
+    gscatter(handles.XGrid(:,1),handles.XGrid(:,2),handles.idx2Region,...
+        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+    hold on;
+    axes(handles.axes1);
+    plot(handles.X(:,1),handles.X(:,2),'k*','MarkerSize',5);
+    title 'Width vs. Length';
+    xlabel 'Width (pixels)';
+    ylabel 'Length (pixels)';
+    legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+    hold off;
     
     handles.extracted = 1;
     

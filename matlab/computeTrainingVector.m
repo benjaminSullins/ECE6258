@@ -16,6 +16,18 @@ for i = 1:numFiles
     trainingVector(i, 2) = varargin{1}{2}(i); % imageEccentricity(i);
     trainingVector(i, 3) = varargin{1}{3}(i); % imageLength(i);
     trainingVector(i, 4) = varargin{1}{4}(i); % imageWidth(i);
+    trainingVector(i, 5) = varargin{1}{5}(i);
+    trainingVector(i, 6) = varargin{1}{6}(i);
+    trainingVector(i, 7) = varargin{1}{7}(i);
+    trainingVector(i, 8) = varargin{1}{8}(i);
+    trainingVector(i, 9) = varargin{1}{9}(i);
+    trainingVector(i, 10) = varargin{1}{10}(i);
+%     trainingVector(i, 11) = varargin{1}{11}(i);
+%     trainingVector(i, 12) = varargin{1}{12}(i);
+%     trainingVector(i, 13) = varargin{1}{13}(i);
+%     trainingVector(i, 14) = varargin{1}{14}(i);
+%     trainingVector(i, 15) = varargin{1}{15}(i);
+%     trainingVector(i, 16) = varargin{1}{16}(i);
 end
 
 % Compute the feature vectors for all of the training images

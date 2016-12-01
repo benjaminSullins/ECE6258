@@ -1,4 +1,4 @@
-function [ C ] = computeKMeansClusters( numVectors, varargin )
+function [ C,XGrid,idx2Region,X ] = computeKMeansClusters( numVectors, varargin )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -32,25 +32,28 @@ for i = 1:numVectors
            break;
        end
     end
-    
-    x1 = min(X(:,1)):step:max(X(:,1));
+  
+    x1 = min(X(:,1)):step:(max(X(:,1)));
     x2 = min(X(:,2)):step:max(X(:,2));
+
     [x1G,x2G] = meshgrid(x1,x2);
     XGrid = [x1G(:),x2G(:)];
+    [nn pp] = size(XGrid);
 
-    idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C{i});
-
-    % Assigns each node in the grid to the closest centroid    
-    figure;
-    gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
-        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
-    hold on;
-    plot(X(:,1),X(:,2),'k*','MarkerSize',5);
-    title 'Width vs. Length';
-    xlabel 'Width (pixels)';
-    ylabel 'Length (pixels)';
-    legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
-    hold off;
+       idx2Region = ones(nn,1);
+%       idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C{i});
+% 
+%     % Assigns each node in the grid to the closest centroid    
+%     figure;
+%     gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
+%         [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+%     hold on;
+%     plot(X(:,1),X(:,2),'k*','MarkerSize',5);
+%     title 'Width vs. Length';
+%     xlabel 'Width (pixels)';
+%     ylabel 'Length (pixels)';
+%     legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+%     hold off;
 end
 
 end

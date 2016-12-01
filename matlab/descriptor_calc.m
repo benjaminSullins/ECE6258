@@ -1,4 +1,4 @@
-function [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles] = descriptor_calc( imageStack )
+function [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( imageStack )
 %UNTITLED11 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -334,6 +334,33 @@ end
 
 clear x y z indexes boundaries binaryImage midX midY
 
+toc
+tic
+% Fourier Descriptors for the Images
+Fourier_mean = zeros(1,numFiles);
+Fourier_max = zeros(1,numFiles);
+Fourier_sigma = zeros(1,numFiles);
+Fourier_min = zeros(1,numFiles);
+Fourier_dc =zeros(1,numFiles);
+Fourier_first = zeros(1,numFiles);
+for i = 1:numFiles
+    image = imageStack(:,:,i);
+    %image = -(image) +realmax(class(image));
+    binaryImage = edge( image );
+%     if i ==1
+%         figure;
+%         imshow(image)
+%         figure;
+%         imshow(binaryImage)
+%     end
+    [ avg, max_coeff ,sigma,min1,dc,firstharmonic ] = fourier_desc( binaryImage );
+    Fourier_mean(i) = avg;
+    Fourier_max(i) = max_coeff;
+    Fourier_sigma(i) = sigma;
+    Fourier_min(i) = min1
+    Fourier_dc(i) =dc;
+    Fourier_first(i) = firstharmonic;
+    
 toc
 
 end
