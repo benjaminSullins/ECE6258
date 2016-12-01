@@ -57,6 +57,28 @@ handles.output = hObject;
 handles.datavalid = 0;
 handles.data2valid = 0;
 handles.extracted =0;
+handles.trainingdata=0;
+currentFolder = cd;
+
+%fileExisting  = (exist(fullfile(currentFolder, 'File'), 'file') == 2);
+file ='trainingFeatureVectorDefault.mat';
+% file2 ='CDefault.mat';
+if exist(fullfile(currentFolder, file), 'file') == 2
+    disp('file found')
+    aa= load('trainingFeatureVectorDefault.mat', 'CDefault');
+    bb= load('trainingFeatureVectorDefault.mat', 'trainingFeatureVectorDefault');
+    handles.trainingFeatureVector = bb.trainingFeatureVectorDefault
+    disp('file2 found')
+    disp(handles.trainingFeatureVector)
+    C = aa.CDefault;
+    
+     handles.C = C;
+     disp(handles.trainingFeatureVector)
+% %     handles.C = num2cell(cluster,[1,6]);
+%      handles.C = cluster;
+    handles.trainingdata=1;
+    
+end
 
 % Update handles structure
 guidata(hObject, handles);
@@ -109,7 +131,20 @@ function classify_Callback(hObject, eventdata, handles)
 %%Classify
 handles=guidata(hObject);
 
-if handles.data2valid~=0 && handles.extracted == 1
+if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
+   
+            disp('testing')
+            if(handles.extracted ==0)
+            if isempty(handles.trainingFeatureVector)|| isempty(handles.C)
+                errordlg('Empty Set:Extract Feature Vectors First');
+                return
+            else
+                warndlg('Using Default Training Vectors');
+               
+            end
+            end
+       
+    
     %[ Orientation, Eccentricity, Width, Length, Fingers, Knuckles] = descriptor_calc( handles.imageop );
     %handles.thisx = [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles];
  [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( handles.imageop);
@@ -212,13 +247,7 @@ handles=guidata(hObject);
 
 if handles.datavalid~=0
     % Compute the training feature vectors
-    %[ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles] = descriptor_calc( handles.imagestack );
-    %handles.x = [imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles];
     [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( handles.imagestack );
-   % handles.x =[ imageOrientation, imageEccentricity, imageWidth, imageLength,real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
-
-    %handles.x =[ imageOrientation, imageEccentricity,real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
-    %handles.x =[ imageOrientation, imageEccentricity, imageWidth, imageLength,real(Fourier_max),imag(Fourier_max),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
     handles.x =[ imageOrientation, imageEccentricity, imageWidth, imageLength,real(Fourier_max),imag(Fourier_max),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
 
 
@@ -230,9 +259,14 @@ if handles.datavalid~=0
     numVectors = 6;
 
 
-    [ handles.C , handles.XGrid,handles.idx2Region,handles.X] = computeKMeansClusters( numVectors, handles.x );
-    [ handles.trainingFeatureVector ] = computeTrainingVector(  numVectors, handles.C, handles.x );
+    [ C , handles.XGrid,handles.idx2Region,handles.X] = computeKMeansClusters( numVectors, handles.x );
+    handles.C = C;
+    [ trainingFeatureVector ] = computeTrainingVector(  numVectors, handles.C, handles.x );
     
+      
+      handles.trainingFeatureVector = trainingFeatureVector;
+%     save('CDefault');
+%     save('trainingFeatureVector');
 
     % Assigns each node in the grid to the closest centroid    
     
