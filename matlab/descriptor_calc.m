@@ -177,6 +177,28 @@ for z = 1:numFiles
 %         
 %     end
 
+%    addpath( './linecurvature_version1b/' );
+%    
+%    sampling = 6;
+%    
+%    % x = (1:max(size(distance)))';
+%    % y = distance;
+%    
+%    k = LineCurvature2D( [x(1:sampling:end) y(1:sampling:end)] );
+%    k = upsample(k,sampling);
+%    k = abs( k );
+%    [ I, J, V ] = find( k > 0.09 );
+%    figure;plot(k);
+%    
+%    N = LineNormals2D( [x y] );
+%    
+%    figure, imshow(binaryImage, []);
+%    % figure, plot(x, y);
+%    hold on;
+%    plot(x(I), y(I), 'r^');
+%    plot([x(1:sampling:end) x(1:sampling:end)+10*N(1:sampling:end,1)]',[y(1:sampling:end) y(1:sampling:end)+10*N(1:sampling:end,2)]');
+%    hold off;
+
     % Now we find the maximum and minimum positions. These will be used to
     % determine if the finger is extended or not.
     [ peak peakIndexes ]        = findpeaks(distance, 'MinPeakHeight', 60);
