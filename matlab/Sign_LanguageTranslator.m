@@ -109,12 +109,14 @@ function classify_Callback(hObject, eventdata, handles)
 %%Classify
 handles=guidata(hObject);
 
-if handles.data2valid~=0
+if handles.data2valid~=0 && handles.extracted == 1
     %[ Orientation, Eccentricity, Width, Length, Fingers, Knuckles] = descriptor_calc( handles.imageop );
     %handles.thisx = [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles];
  [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( handles.imageop);
     %handles.thisx =[ Orientation, Eccentricity, Width, Length, Fingers, Knuckles,real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), Fingers, Knuckles];
-    handles.thisx =[ real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), Fingers, Knuckles];
+
+    handles.thisx =[ Orientation, Eccentricity, Width, Length,real(Fourier_max),imag(Fourier_max),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), Fingers, Knuckles];
+
 
 
     % Compute the number of descriptor features.
@@ -122,7 +124,9 @@ if handles.data2valid~=0
     numVectors = max(size(handles.thisx)) / 2;
     %numVectors = 2;
     %numVectors = 8;
-    numVectors = 5;
+
+    numVectors = 6;
+
     
     % Update the GUI
     set(handles.textOrientation,'string',Orientation);
@@ -132,10 +136,19 @@ if handles.data2valid~=0
     set(handles.textLength,'string',Length);
     
     % Attempt to classify the input sign
-    handles.label = classify( numVectors, handles.trainingFeatureVector, handles.C, handles.thisx ); % , handles.to, handles.t1);
+    [handles.label handles.corrPlot] = classify( numVectors, handles.trainingFeatureVector, handles.C, handles.thisx ); % , handles.to, handles.t1);
     
     % Update the Output Image
     handles.img = getImage( '../imagesPristine/', handles.label );
+
+%     axes(handles.axes7);
+%     imshow(handles.img);
+
+    % Plot the correlation
+    %handles.disp = plot(handles.corrPlot,'Parent',handles.axes4);
+    axes(handles.axes3);
+     plot( handles.corrPlot,'k*','MarkerSize',5);
+
     
     % Clear the axes to prevent ghost images overlaying each other
     cla(handles.axes7);
@@ -143,9 +156,13 @@ if handles.data2valid~=0
     % Update axes with the pristine image
     axes(handles.axes7);
     imshow(handles.img);
+%     handles.disp = imshow(handles.img,'Parent',handles.axes7);
+
     
-else
-    warndlg('Error:No files uploaded')
+elseif handles.data2valid==0  
+    warndlg('Error:No files uploaded');
+elseif handles.extracted == 0
+     warndlg('Error:Please Extract features first');   
 end
 
 % --- Executes on button press in loadimage.
@@ -199,14 +216,19 @@ if handles.datavalid~=0
     %handles.x = [imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles];
     [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( handles.imagestack );
    % handles.x =[ imageOrientation, imageEccentricity, imageWidth, imageLength,real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
-    handles.x =[ real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
+
+    %handles.x =[ imageOrientation, imageEccentricity,real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
+    %handles.x =[ imageOrientation, imageEccentricity, imageWidth, imageLength,real(Fourier_max),imag(Fourier_max),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
+    handles.x =[ imageOrientation, imageEccentricity, imageWidth, imageLength,real(Fourier_max),imag(Fourier_max),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
+
 
     
     % Override the NUmber of feature vectors
     numVectors = max(size(handles.x)) / 2;
     %numVectors = 2;
     %numVectors = 8;
-    numVectors = 5;
+    numVectors = 6;
+
 
     [ handles.C , handles.XGrid,handles.idx2Region,handles.X] = computeKMeansClusters( numVectors, handles.x );
     [ handles.trainingFeatureVector ] = computeTrainingVector(  numVectors, handles.C, handles.x );

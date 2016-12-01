@@ -345,19 +345,12 @@ Fourier_dc =zeros(1,numFiles);
 Fourier_first = zeros(1,numFiles);
 for i = 1:numFiles
     image = imageStack(:,:,i);
-    %image = -(image) +realmax(class(image));
     binaryImage = edge( image );
-%     if i ==1
-%         figure;
-%         imshow(image)
-%         figure;
-%         imshow(binaryImage)
-%     end
     [ avg, max_coeff ,sigma,min1,dc,firstharmonic ] = fourier_desc( binaryImage );
     Fourier_mean(i) = avg;
     Fourier_max(i) = max_coeff;
     Fourier_sigma(i) = sigma;
-    Fourier_min(i) = min1
+    Fourier_min(i) = min1;
     Fourier_dc(i) =dc;
     Fourier_first(i) = firstharmonic;
     
