@@ -136,6 +136,11 @@ if handles.data2valid~=0
     
     % Update the Output Image
     handles.img = getImage( '../imagesPristine/', handles.label );
+    
+    % Clear the axes to prevent ghost images overlaying each other
+    cla(handles.axes7);
+    
+    % Update axes with the pristine image
     axes(handles.axes7);
     imshow(handles.img);
     
