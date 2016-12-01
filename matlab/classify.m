@@ -1,4 +1,4 @@
-function [ sign ] = classify( numVectors, trainingFeatureVector, C, varargin )
+function [ sign,corrPlot ] = classify( numVectors, trainingFeatureVector, C, varargin )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -67,9 +67,9 @@ for i = 1:numFiles
     end
 end
 
-% Plot the correlation
-figure;
-plot( corrPlot,'k*','MarkerSize',5);
+% % Plot the correlation
+% figure;
+% plot( corrPlot,'k*','MarkerSize',5);
 
 % The input image has been found based on it's correlation with the
 % training image feature vectors.
