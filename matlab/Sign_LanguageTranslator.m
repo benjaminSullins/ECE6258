@@ -1,5 +1,9 @@
 function varargout = Sign_LanguageTranslator(varargin)
 % SIGN_LANGUAGETRANSLATOR MATLAB code for Sign_LanguageTranslator.fig
+%      Top level code. This should be run when executing the project. This file
+%      handles the GUI inputs and outputs while also calling the appropriate
+%      functions needed for operation.
+%
 %      SIGN_LANGUAGETRANSLATOR, by itself, creates a new SIGN_LANGUAGETRANSLATOR or raises the existing
 %      singleton*.
 %

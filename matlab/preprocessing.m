@@ -1,6 +1,6 @@
 function [ imageStack,check ] = preprocessing( filePath, filename, key )
-%UNTITLED10 Summary of this function goes here
-%   Detailed explanation goes here
+%UNTITLED10 Imports images into the program and modifies them accordingly to remove
+%major disimilarities between images that would impede code exection.
 %key = 0 Training phase, load multiple images
 %key = 1 Testing phase, load single image
 %% Import Training Images

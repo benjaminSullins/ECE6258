@@ -1,6 +1,8 @@
 function [ sign,corrPlot ] = classify( numVectors, trainingFeatureVector, C, varargin )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%This file computes the final sign output based on the training vector feature
+%vectors and their corresponding group locations generated from the K-Means
+%algorithm. A correlation is run amongst the estimated group regions to
+%identify the most likely sign language character that the input belongs to.
 
 display('Classifying Sign');
 tic

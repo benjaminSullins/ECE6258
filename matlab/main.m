@@ -18,6 +18,9 @@
 % http://cs229.stanford.edu/proj2011/KurdyumovHoNg-SignLanguageClassificationUsingWebcamImages.pdf
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% This file was the original Matlab file used in the project construction. It
+% is now obsolete, but is left for completeness, revision control, and debugging.
+                                
 clear all;
 close all;
 fclose('all');

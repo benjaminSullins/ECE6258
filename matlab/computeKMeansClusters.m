@@ -1,6 +1,10 @@
 function [ C,XGrid,idx2Region,X ] = computeKMeansClusters( numVectors, varargin )
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+%Takes the feature vector results and executes a K-Means clustering algorithm
+%to aid in reducing the overall complexity of the design. The centroids from
+%the clustering algorithm are used for adding region descriptors to the
+%estimation results to help in downselecting the available signs to only a 
+%select few. This removes large correlation computations to a small collection
+%of data points.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Trying to do K Means

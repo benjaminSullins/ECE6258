@@ -1,5 +1,5 @@
 function [ image ] = getImage( filePath, fileNumber )
-%UNTITLED3 Summary of this function goes here
+%Imports and image and returns it to the calling function.
 %   Detailed explanation goes here
 
 %% Getting Image
