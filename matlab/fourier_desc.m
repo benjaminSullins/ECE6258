@@ -13,7 +13,7 @@ function [ avg, max_coeff ,sigma,min1,dc,firstharmonic ] = fourier_desc( binaryI
  
 % No of samples
  m = length([x y]);
- 
+
  %Complex Contour Representation
  c =[x + i*y];
  
@@ -22,7 +22,11 @@ function [ avg, max_coeff ,sigma,min1,dc,firstharmonic ] = fourier_desc( binaryI
  
  %Normalize with zero component for scale invariance
  F_norm = F/abs(F(1));
- 
+
+% figure;
+% plot(x,log(real(F_norm+1)),'r');
+% figure;
+% plot(log(imag(F_norm+1)),y,'b');
  %Descriptors
  avg= mean(F_norm);
  max_coeff = F_norm(end);
