@@ -534,7 +534,52 @@ end
 % Plot the correlation
 figure;
 plot( corrPlot,'k*','MarkerSize',5);
+title('Correlation');
 
 % The input image has been found based on it's correlation with the
 % training image feature vectors.
 toc;
+tic
+% Fourier Descriptors for the Images
+Fourier_mean = zeros(1,numFiles);
+Fourier_max = zeros(1,numFiles);
+Fourier_sigma = zeros(1,numFiles);
+Fourier_min = zeros(1,numFiles);
+Fourier_dc =zeros(1,numFiles);
+Fourier_first = zeros(1,numFiles);
+for i = 1:numFiles
+    image = imageStack(:,:,i);
+    binaryImage = edge( image );
+    [ avg, max_coeff ,sigma,min1,dc,firstharmonic ] = fourier_desc( binaryImage );
+    Fourier_mean(i) = avg;
+    Fourier_max(i) = max_coeff;
+    Fourier_sigma(i) = sigma;
+    Fourier_min(i) = min1;
+    Fourier_dc(i) =dc;
+    Fourier_first(i) = firstharmonic;
+    
+
+
+end
+toc;
+
+
+figure;
+plot((real(Fourier_max)),'*')
+hold on
+plot(real(Fourier_min),'o')
+hold on
+plot(real(Fourier_dc),'+')
+hold on
+plot(real(Fourier_first),'v')
+plot((imag(Fourier_max)),'*')
+hold on
+plot(imag(Fourier_min),'o')
+hold on
+plot(imag(Fourier_dc),'+')
+hold on
+plot(imag(Fourier_first),'v');
+% legend('y-max','y-min','y-Zero-frequency','y-First Harmonic')
+% legend('x-max','x-min','x-Zero-frequency','x-First Harmonic')
+legend('x-max','x-min','x-Zero-frequency','x-First Harmonic','y-max','y-min','y-Zero-frequency','y-First Harmonic')
+title('Frequency Domain Descriptors');

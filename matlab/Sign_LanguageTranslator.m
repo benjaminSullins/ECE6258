@@ -68,18 +68,14 @@ currentFolder = cd;
 file ='trainingFeatureVectorDefault.mat';
 % file2 ='CDefault.mat';
 if exist(fullfile(currentFolder, file), 'file') == 2
-    disp('file found')
+
     aa= load('trainingFeatureVectorDefault.mat', 'CDefault');
     bb= load('trainingFeatureVectorDefault.mat', 'trainingFeatureVectorDefault');
     handles.trainingFeatureVector = bb.trainingFeatureVectorDefault
-    disp('file2 found')
-    disp(handles.trainingFeatureVector)
     C = aa.CDefault;
     
      handles.C = C;
-     disp(handles.trainingFeatureVector)
-% %     handles.C = num2cell(cluster,[1,6]);
-%      handles.C = cluster;
+
     handles.trainingdata=1;
     
 end
@@ -185,8 +181,9 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
 
     % Plot the correlation
     %handles.disp = plot(handles.corrPlot,'Parent',handles.axes4);
-    axes(handles.axes3);
+    axes(handles.axes5);
      plot( handles.corrPlot,'k*','MarkerSize',5);
+     title('Image Correlation')
 
     
     % Clear the axes to prevent ghost images overlaying each other
@@ -275,16 +272,81 @@ if handles.datavalid~=0
     % Assigns each node in the grid to the closest centroid    
     
     
-    gscatter(handles.XGrid(:,1),handles.XGrid(:,2),handles.idx2Region,...
-        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
-    hold on;
-    axes(handles.axes1);
-    plot(handles.X(:,1),handles.X(:,2),'k*','MarkerSize',5);
-    title 'Width vs. Length';
-    xlabel 'Width (pixels)';
-    ylabel 'Length (pixels)';
-    legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
-    hold off;
+X = [ imageWidth' imageLength'];
+
+% Find the predicted and actual centroid locations
+opts = statset('Display','final');
+[idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
+    'Replicates',5,'Options',opts);
+
+% Defines a fine grid on the plot
+x1 = min(X(:,1)):0.1:max(X(:,1));
+x2 = min(X(:,2)):0.1:max(X(:,2));
+[x1G,x2G] = meshgrid(x1,x2);
+XGrid = [x1G(:),x2G(:)];
+
+idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
+
+% Assigns each node in the grid to the closest centroid    
+axes(handles.axes1);
+gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
+    [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+hold on;
+plot(X(:,1),X(:,2),'k*','MarkerSize',5);
+title 'Width vs. Length';
+xlabel 'Width (pixels)';
+ylabel 'Length (pixels)';
+legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+hold off;
+    
+    
+    %Orientation vs Eccentricity
+    X = [ imageOrientation' imageEccentricity' ];
+
+% Find the predicted and actual centroid locations
+opts = statset('Display','final');
+[idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
+    'Replicates',5,'Options',opts);
+
+% Defines a fine grid on the plot
+x1 = min(X(:,1)):0.001:max(X(:,1));
+x2 = min(X(:,2)):0.001:max(X(:,2));
+[x1G,x2G] = meshgrid(x1,x2);
+XGrid = [x1G(:),x2G(:)];
+
+idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
+
+% Assigns each node in the grid to the closest centroid    
+axes(handles.axes3);
+gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
+    [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+hold on;
+plot(X(:,1),X(:,2),'k*','MarkerSize',5);
+title 'Orientation vs. Eccentricity';
+xlabel 'Orientation';
+ylabel 'Eccentricity';
+legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+hold off;
+
+    
+    % Plot Frequency Domain Derived Descriptors
+axes(handles.axes4);
+plot((real(Fourier_max)),'*')
+hold on
+plot(real(Fourier_min),'o')
+hold on
+plot(real(Fourier_dc),'+')
+hold on
+plot(real(Fourier_first),'v')
+plot((imag(Fourier_max)),'*')
+hold on
+plot(imag(Fourier_min),'o')
+hold on
+plot(imag(Fourier_dc),'+')
+hold on
+plot(imag(Fourier_first),'v');
+legend('x-max','x-min','x-Zero-frequency','x-First Harmonic','y-max','y-min','y-Zero-frequency','y-First Harmonic')
+title('Frequency Domain Descriptors');
     
     handles.extracted = 1;
     
