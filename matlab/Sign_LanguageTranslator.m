@@ -371,7 +371,7 @@ if handles.datavalid~=0
     hold on
     plot(imag(Fourier_first),'v');
     %legend('x-max','x-min','x-Zero-frequency','x-First Harmonic','y-max','y-min','y-Zero-frequency','y-First Harmonic')
-    title('Frequency Domain Descriptors');
+    title('Fourier Descriptors');
     
     handles.extracted = 1;
     
