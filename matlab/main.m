@@ -531,7 +531,7 @@ end
 % Plot the correlation
 figure;
 plot( corrPlot,'k*','MarkerSize',5);
-title('Correlation')
+title('Correlation');
 
 % The input image has been found based on it's correlation with the
 % training image feature vectors.

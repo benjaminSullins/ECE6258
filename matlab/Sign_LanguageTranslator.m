@@ -64,18 +64,14 @@ currentFolder = cd;
 file ='trainingFeatureVectorDefault.mat';
 % file2 ='CDefault.mat';
 if exist(fullfile(currentFolder, file), 'file') == 2
-    disp('file found')
+
     aa= load('trainingFeatureVectorDefault.mat', 'CDefault');
     bb= load('trainingFeatureVectorDefault.mat', 'trainingFeatureVectorDefault');
     handles.trainingFeatureVector = bb.trainingFeatureVectorDefault
-    disp('file2 found')
-    disp(handles.trainingFeatureVector)
     C = aa.CDefault;
     
      handles.C = C;
-     disp(handles.trainingFeatureVector)
-% %     handles.C = num2cell(cluster,[1,6]);
-%      handles.C = cluster;
+
     handles.trainingdata=1;
     
 end
@@ -181,9 +177,9 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
 
     % Plot the correlation
     %handles.disp = plot(handles.corrPlot,'Parent',handles.axes4);
-    axes(handles.axes3);
+    axes(handles.axes5);
      plot( handles.corrPlot,'k*','MarkerSize',5);
-     title('Correlation')
+     title('Image Correlation')
 
     
     % Clear the axes to prevent ghost images overlaying each other
@@ -271,11 +267,15 @@ if handles.datavalid~=0
 
     % Assigns each node in the grid to the closest centroid    
     
-    
-    gscatter(handles.XGrid(:,1),handles.XGrid(:,2),handles.idx2Region,...
-        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
-    hold on;
     axes(handles.axes1);
+    XG1=handles.XGrid(:,1);
+    XG2=handles.XGrid(:,2);
+    idx2Region = handles.idx2Region;
+    gscatter(XG1,XG2,idx2Region,...
+        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+    title('Orientation /Eccentricity')
+    
+    axes(handles.axes3);
     plot(handles.X(:,1),handles.X(:,2),'k*','MarkerSize',5);
     title 'Width vs. Length';
     xlabel 'Width (pixels)';
