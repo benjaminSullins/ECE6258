@@ -1,6 +1,8 @@
 function [ trainingFeatureVector ] = computeTrainingVector( numVectors, C, varargin )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%This file takes the feature vector extractions and generates an array for
+%future execution amongst the results. The file also computes the distance
+%between the K-Means centroids to selectively choose which centroid the
+%training vector belongs to.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute the training feature vectors

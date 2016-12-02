@@ -1,6 +1,6 @@
 function [ avg, max_coeff ,sigma,min1,dc,firstharmonic ] = fourier_desc( binaryImage )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%Computes select Fourier feature vectors. Is called as a helper function
+%for the descriptor_calc.m file.
 %Elliptical description of boundary curve is used( points are represented
 %as complex coordinates)
 % zero component is the center of gravity

@@ -1,6 +1,7 @@
 function [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( imageStack )
-%UNTITLED11 Summary of this function goes here
-%   Detailed explanation goes here
+%This file computes the Length/Width, Orientation/Eccentricity, Finger
+%Segmentation (Number of Fingers), and the Fourier feature vectors. Think
+%of this as the meat and potatoes.
 
 %% Intertial Moment Calculation
 % The first set of key descriptors will be the moments (inertia)
@@ -362,8 +363,11 @@ end
 clear x y z indexes boundaries binaryImage midX midY
 
 toc
+
+%% Fourier Descriptors for the Images
+disp('Computing Fourier Descriptors');
 tic
-% Fourier Descriptors for the Images
+
 Fourier_mean = zeros(1,numFiles);
 Fourier_max = zeros(1,numFiles);
 Fourier_sigma = zeros(1,numFiles);

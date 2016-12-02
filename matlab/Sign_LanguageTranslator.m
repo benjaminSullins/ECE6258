@@ -1,5 +1,9 @@
 function varargout = Sign_LanguageTranslator(varargin)
 % SIGN_LANGUAGETRANSLATOR MATLAB code for Sign_LanguageTranslator.fig
+%      Top level code. This should be run when executing the project. This file
+%      handles the GUI inputs and outputs while also calling the appropriate
+%      functions needed for operation.
+%
 %      SIGN_LANGUAGETRANSLATOR, by itself, creates a new SIGN_LANGUAGETRANSLATOR or raises the existing
 %      singleton*.
 %
@@ -22,7 +26,7 @@ function varargout = Sign_LanguageTranslator(varargin)
 
 % Edit the above text to modify the response to help Sign_LanguageTranslator
 
-% Last Modified by GUIDE v2.5 26-Nov-2016 15:57:23
+% Last Modified by GUIDE v2.5 02-Dec-2016 00:10:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -116,6 +120,8 @@ handles.key = 1;
 % Pre-Processing
 [handles.imageop handles.data2valid] = preprocessing( handles.path, handles.file, handles.key);
 
+set(handles.text25, 'String', 'Complete!' );
+
 % Complete
 guidata(hObject, handles);
 
@@ -190,6 +196,7 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
     imshow(handles.img);
 %     handles.disp = imshow(handles.img,'Parent',handles.axes7);
 
+set(handles.text26, 'String', 'Complete!' );
     
 elseif handles.data2valid==0  
     warndlg('Error:No files uploaded');
@@ -213,7 +220,9 @@ handles.key = 0;
 
 [handles.imagestack handles.datavalid] = preprocessing( directory,handles.filename,handles.key);
 
-  guidata(hObject, handles);
+set(handles.text22, 'String', 'Complete!' );
+
+guidata(hObject, handles);
 
 % --- Executes on button press in train.
 function train_Callback(hObject, eventdata, handles)
@@ -222,17 +231,19 @@ function train_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 %train handles.x is feature vector
 
-if handles.datavalid~=0 && handles.extracted ~=0
-%     handles = guidata(hObject);
-%     [to t1] = training(handles.x);
-%     handles.to = to;
-%     handles.t1 = t1;
-elseif handles.datavalid == 0
-    warndlg('Error:No files uploaded')
-elseif handles.extracted ==0
-    warndlg('Error:Please Extract Features first')
-end
-guidata(hObject, handles);
+warndlg('Error: Training Not Supported (Version 1.0)')
+
+% if handles.datavalid~=0 && handles.extracted ~=0
+% %     handles = guidata(hObject);
+% %     [to t1] = training(handles.x);
+% %     handles.to = to;
+% %     handles.t1 = t1;
+% elseif handles.datavalid == 0
+%     warndlg('Error:No files uploaded')
+% elseif handles.extracted ==0
+%     warndlg('Error:Please Extract Features first')
+% end
+% guidata(hObject, handles);
 
 
 % --- Executes on button press in extractfeatures.
@@ -351,4 +362,45 @@ else
    warndlg('Error:No file uploaded') 
 end
 
+set(handles.text23, 'String', 'Complete!' );
+
 guidata(hObject, handles);
+
+
+% --- Executes on button press in readmeButton.
+function readmeButton_Callback(hObject, eventdata, handles)
+% hObject    handle to readmeButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+%# read text file lines as cell array of strings
+
+% References:
+% http://stackoverflow.com/questions/7910287/what-is-the-best-way-to-display-a-large-text-file-in-matlab-guide
+% https://www.mathworks.com/matlabcentral/fileexchange/14317-findjobj-find-java-handles-of-matlab-graphic-objects
+
+addpath( './findobjs' );
+
+fid = fopen( '../README.md' );
+str = textscan(fid, '%s', 'Delimiter','\n'); str = str{1};
+fclose(fid);
+
+%# GUI with multi-line editbox
+hFig = figure('Menubar','none', 'Toolbar','none');
+hPan = uipanel(hFig, 'Title','README.md', ...
+    'Units','normalized', 'Position',[0.05 0.05 0.9 0.9]);
+hEdit = uicontrol(hPan, 'Style','edit', 'FontSize',9, ...
+    'Min',0, 'Max',2, 'HorizontalAlignment','left', ...
+    'Units','normalized', 'Position',[0 0 1 1], ...
+    'String',str);
+
+% %# enable horizontal scrolling
+% jEdit = findjobj(hEdit);
+% jEditbox = jEdit.getViewport().getComponent(0);
+% jEditbox.setWrapping(false);                %# turn off word-wrapping
+% jEditbox.setEditable(false);                %# non-editable
+% set(jEdit,'HorizontalScrollBarPolicy',30);  %# HORIZONTAL_SCROLLBAR_AS_NEEDED
+% 
+% %# maintain horizontal scrollbar policy which reverts back on component resize 
+% hjEdit = handle(jEdit,'CallbackProperties');
+% set(hjEdit, 'ComponentResizedCallback',...
+%     'set(gcbo,''HorizontalScrollBarPolicy'',30)')
