@@ -1,4 +1,4 @@
-function [ image ] = getImage( filePath, fileNumber )
+function [ image fileName ] = getImage( filePath, fileNumber )
 %Imports and image and returns it to the calling function.
 %   Detailed explanation goes here
 
@@ -20,6 +20,8 @@ offset = 2;
 
 % Read image
 image = imread(strcat(filePath, files(fileNumber + offset).name), 'jpg');
+
+fileName = files(fileNumber + offset).name;
 
 end
 

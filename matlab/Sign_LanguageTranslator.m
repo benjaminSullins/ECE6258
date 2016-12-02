@@ -71,7 +71,7 @@ if exist(fullfile(currentFolder, file), 'file') == 2
     
     aa= load('trainingFeatureVectorDefault.mat', 'CDefault');
     bb= load('trainingFeatureVectorDefault.mat', 'trainingFeatureVectorDefault');
-    handles.trainingFeatureVector = bb.trainingFeatureVectorDefault
+    handles.trainingFeatureVector = bb.trainingFeatureVectorDefault;
     C = aa.CDefault;
     
     handles.C = C;
@@ -133,6 +133,13 @@ function classify_Callback(hObject, eventdata, handles)
 %%Classify
 handles=guidata(hObject);
 
+timeStart = tic;
+
+if ~exist('handles.error_rate')
+    handles.error_rate = 0;
+    handles.totalRuns = 0;
+end
+
 if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
     
     disp('testing')
@@ -171,11 +178,9 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
     [handles.label handles.corrPlot] = classify( numVectors, handles.trainingFeatureVector, handles.C, handles.thisx ); % , handles.to, handles.t1);
     
     % Update the Output Image
-    handles.img = getImage( '../imagesPristine/', handles.label );
-    
-    %     axes(handles.axes7);
-    %     imshow(handles.img);
-    
+
+    [ handles.img handles.outputFile] = getImage( '../imagesPristine/', handles.label );
+
     % Plot the correlation
     %handles.disp = plot(handles.corrPlot,'Parent',handles.axes4);
     axes(handles.axes5);
@@ -189,7 +194,22 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
     % Update axes with the pristine image
     axes(handles.axes7);
     imshow(handles.img);
-    %     handles.disp = imshow(handles.img,'Parent',handles.axes7);
+
+
+timeElapsed = toc(timeStart);
+
+% Check for error
+if handles.file ~= handles.outputFile
+    handles.error_rate  = handles.error_rate + 1;
+end
+
+handles.totalRuns   = handles.totalRuns + 1;
+error = (handles.error_rate / handles.totalRuns ) * 100;
+
+set(handles.textError, 'String', strcat( num2str(error), ' %') );
+set(handles.textSpeed, 'String', strcat( num2str(timeElapsed), ' seconds') );
+set(handles.text26, 'String', 'Complete!' );
+
     
     set(handles.text26, 'String', 'Complete!' );
     
