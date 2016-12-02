@@ -267,22 +267,63 @@ if handles.datavalid~=0
 
     % Assigns each node in the grid to the closest centroid    
     
-    axes(handles.axes1);
-    XG1=handles.XGrid(:,1);
-    XG2=handles.XGrid(:,2);
-    idx2Region = handles.idx2Region;
-    gscatter(XG1,XG2,idx2Region,...
-        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
-    title('Orientation /Eccentricity')
     
-    axes(handles.axes3);
-    plot(handles.X(:,1),handles.X(:,2),'k*','MarkerSize',5);
-    title 'Width vs. Length';
-    xlabel 'Width (pixels)';
-    ylabel 'Length (pixels)';
-    legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
-    hold off;
+X = [ imageWidth' imageLength'];
+
+% Find the predicted and actual centroid locations
+opts = statset('Display','final');
+[idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
+    'Replicates',5,'Options',opts);
+
+% Defines a fine grid on the plot
+x1 = min(X(:,1)):0.1:max(X(:,1));
+x2 = min(X(:,2)):0.1:max(X(:,2));
+[x1G,x2G] = meshgrid(x1,x2);
+XGrid = [x1G(:),x2G(:)];
+
+idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
+
+% Assigns each node in the grid to the closest centroid    
+axes(handles.axes1);
+gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
+    [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+hold on;
+plot(X(:,1),X(:,2),'k*','MarkerSize',5);
+title 'Width vs. Length';
+xlabel 'Width (pixels)';
+ylabel 'Length (pixels)';
+legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+hold off;
     
+    
+    %Orientation vs Eccentricity
+    X = [ imageOrientation' imageEccentricity' ];
+
+% Find the predicted and actual centroid locations
+opts = statset('Display','final');
+[idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
+    'Replicates',5,'Options',opts);
+
+% Defines a fine grid on the plot
+x1 = min(X(:,1)):0.001:max(X(:,1));
+x2 = min(X(:,2)):0.001:max(X(:,2));
+[x1G,x2G] = meshgrid(x1,x2);
+XGrid = [x1G(:),x2G(:)];
+
+idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
+
+% Assigns each node in the grid to the closest centroid    
+axes(handles.axes3);
+gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
+    [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+hold on;
+plot(X(:,1),X(:,2),'k*','MarkerSize',5);
+title 'Orientation vs. Eccentricity';
+xlabel 'Orientation';
+ylabel 'Eccentricity';
+legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+hold off;
+
     
     % Plot Frequency Domain Derived Descriptors
 axes(handles.axes4);
