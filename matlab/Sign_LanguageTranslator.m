@@ -26,7 +26,7 @@ function varargout = Sign_LanguageTranslator(varargin)
 
 % Edit the above text to modify the response to help Sign_LanguageTranslator
 
-% Last Modified by GUIDE v2.5 26-Nov-2016 15:57:23
+% Last Modified by GUIDE v2.5 01-Dec-2016 23:42:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -356,3 +356,42 @@ else
 end
 
 guidata(hObject, handles);
+
+
+% --- Executes on button press in readmeButton.
+function readmeButton_Callback(hObject, eventdata, handles)
+% hObject    handle to readmeButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+%# read text file lines as cell array of strings
+
+% References:
+% http://stackoverflow.com/questions/7910287/what-is-the-best-way-to-display-a-large-text-file-in-matlab-guide
+% https://www.mathworks.com/matlabcentral/fileexchange/14317-findjobj-find-java-handles-of-matlab-graphic-objects
+
+addpath( './findobjs' );
+
+fid = fopen( '../README.md' );
+str = textscan(fid, '%s', 'Delimiter','\n'); str = str{1};
+fclose(fid);
+
+%# GUI with multi-line editbox
+hFig = figure('Menubar','none', 'Toolbar','none');
+hPan = uipanel(hFig, 'Title','README.md', ...
+    'Units','normalized', 'Position',[0.05 0.05 0.9 0.9]);
+hEdit = uicontrol(hPan, 'Style','edit', 'FontSize',9, ...
+    'Min',0, 'Max',2, 'HorizontalAlignment','left', ...
+    'Units','normalized', 'Position',[0 0 1 1], ...
+    'String',str);
+
+%# enable horizontal scrolling
+jEdit = findjobj(hEdit);
+jEditbox = jEdit.getViewport().getComponent(0);
+jEditbox.setWrapping(false);                %# turn off word-wrapping
+jEditbox.setEditable(false);                %# non-editable
+set(jEdit,'HorizontalScrollBarPolicy',30);  %# HORIZONTAL_SCROLLBAR_AS_NEEDED
+
+%# maintain horizontal scrollbar policy which reverts back on component resize 
+hjEdit = handle(jEdit,'CallbackProperties');
+set(hjEdit, 'ComponentResizedCallback',...
+    'set(gcbo,''HorizontalScrollBarPolicy'',30)')
