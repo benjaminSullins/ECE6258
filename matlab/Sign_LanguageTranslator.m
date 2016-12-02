@@ -133,6 +133,8 @@ function classify_Callback(hObject, eventdata, handles)
 %%Classify
 handles=guidata(hObject);
 
+timeStart = tic;
+
 if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
    
             disp('testing')
@@ -196,6 +198,9 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
     imshow(handles.img);
 %     handles.disp = imshow(handles.img,'Parent',handles.axes7);
 
+timeElapsed = toc(timeStart);
+
+set(handles.textSpeed, 'String', strcat( num2str(timeElapsed), ' seconds') );
 set(handles.text26, 'String', 'Complete!' );
     
 elseif handles.data2valid==0  
