@@ -148,7 +148,10 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
             errordlg('Empty Set:Extract Feature Vectors First');
             return
         else
-            warndlg('Using Default Training Vectors');
+            answer =questdlg('Using Default Training Vectors, Proceed?','loading data','Yes','No','Cancel');
+            if ~strcmp(answer,'Yes')
+                return;
+            end
             
         end
     end
