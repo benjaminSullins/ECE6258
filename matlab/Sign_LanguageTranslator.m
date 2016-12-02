@@ -226,17 +226,19 @@ function train_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 %train handles.x is feature vector
 
-if handles.datavalid~=0 && handles.extracted ~=0
-%     handles = guidata(hObject);
-%     [to t1] = training(handles.x);
-%     handles.to = to;
-%     handles.t1 = t1;
-elseif handles.datavalid == 0
-    warndlg('Error:No files uploaded')
-elseif handles.extracted ==0
-    warndlg('Error:Please Extract Features first')
-end
-guidata(hObject, handles);
+warndlg('Error: Training Not Supported (Version 1.0)')
+
+% if handles.datavalid~=0 && handles.extracted ~=0
+% %     handles = guidata(hObject);
+% %     [to t1] = training(handles.x);
+% %     handles.to = to;
+% %     handles.t1 = t1;
+% elseif handles.datavalid == 0
+%     warndlg('Error:No files uploaded')
+% elseif handles.extracted ==0
+%     warndlg('Error:Please Extract Features first')
+% end
+% guidata(hObject, handles);
 
 
 % --- Executes on button press in extractfeatures.
