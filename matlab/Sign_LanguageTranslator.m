@@ -312,7 +312,7 @@ if handles.datavalid~=0
     % Assigns each node in the grid to the closest centroid
     axes(handles.axes1);
     gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
-        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..',[],'off');
     hold on;
     plot(X(:,1),X(:,2),'k*','MarkerSize',5);
     title 'Width vs. Length';
@@ -341,7 +341,7 @@ if handles.datavalid~=0
     % Assigns each node in the grid to the closest centroid
     axes(handles.axes3);
     gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
-        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..',[],'off');
     hold on;
     plot(X(:,1),X(:,2),'k*','MarkerSize',5);
     title 'Orientation vs. Eccentricity';
