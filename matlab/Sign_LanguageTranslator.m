@@ -26,7 +26,7 @@ function varargout = Sign_LanguageTranslator(varargin)
 
 % Edit the above text to modify the response to help Sign_LanguageTranslator
 
-% Last Modified by GUIDE v2.5 01-Dec-2016 23:42:51
+% Last Modified by GUIDE v2.5 02-Dec-2016 00:10:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -120,6 +120,8 @@ handles.key = 1;
 % Pre-Processing
 [handles.imageop handles.data2valid] = preprocessing( handles.path, handles.file, handles.key);
 
+set(handles.text25, 'String', 'Complete!' );
+
 % Complete
 guidata(hObject, handles);
 
@@ -194,6 +196,7 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
     imshow(handles.img);
 %     handles.disp = imshow(handles.img,'Parent',handles.axes7);
 
+set(handles.text26, 'String', 'Complete!' );
     
 elseif handles.data2valid==0  
     warndlg('Error:No files uploaded');
@@ -217,7 +220,9 @@ handles.key = 0;
 
 [handles.imagestack handles.datavalid] = preprocessing( directory,handles.filename,handles.key);
 
-  guidata(hObject, handles);
+set(handles.text22, 'String', 'Complete!' );
+
+guidata(hObject, handles);
 
 % --- Executes on button press in train.
 function train_Callback(hObject, eventdata, handles)
@@ -357,6 +362,8 @@ else
    warndlg('Error:No file uploaded') 
 end
 
+set(handles.text23, 'String', 'Complete!' );
+
 guidata(hObject, handles);
 
 
@@ -386,14 +393,14 @@ hEdit = uicontrol(hPan, 'Style','edit', 'FontSize',9, ...
     'Units','normalized', 'Position',[0 0 1 1], ...
     'String',str);
 
-%# enable horizontal scrolling
-jEdit = findjobj(hEdit);
-jEditbox = jEdit.getViewport().getComponent(0);
-jEditbox.setWrapping(false);                %# turn off word-wrapping
-jEditbox.setEditable(false);                %# non-editable
-set(jEdit,'HorizontalScrollBarPolicy',30);  %# HORIZONTAL_SCROLLBAR_AS_NEEDED
-
-%# maintain horizontal scrollbar policy which reverts back on component resize 
-hjEdit = handle(jEdit,'CallbackProperties');
-set(hjEdit, 'ComponentResizedCallback',...
-    'set(gcbo,''HorizontalScrollBarPolicy'',30)')
+% %# enable horizontal scrolling
+% jEdit = findjobj(hEdit);
+% jEditbox = jEdit.getViewport().getComponent(0);
+% jEditbox.setWrapping(false);                %# turn off word-wrapping
+% jEditbox.setEditable(false);                %# non-editable
+% set(jEdit,'HorizontalScrollBarPolicy',30);  %# HORIZONTAL_SCROLLBAR_AS_NEEDED
+% 
+% %# maintain horizontal scrollbar policy which reverts back on component resize 
+% hjEdit = handle(jEdit,'CallbackProperties');
+% set(hjEdit, 'ComponentResizedCallback',...
+%     'set(gcbo,''HorizontalScrollBarPolicy'',30)')
