@@ -31,11 +31,11 @@ function varargout = Sign_LanguageTranslator(varargin)
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @Sign_LanguageTranslator_OpeningFcn, ...
-                   'gui_OutputFcn',  @Sign_LanguageTranslator_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @Sign_LanguageTranslator_OpeningFcn, ...
+    'gui_OutputFcn',  @Sign_LanguageTranslator_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -68,14 +68,14 @@ currentFolder = cd;
 file ='trainingFeatureVectorDefault.mat';
 % file2 ='CDefault.mat';
 if exist(fullfile(currentFolder, file), 'file') == 2
-
+    
     aa= load('trainingFeatureVectorDefault.mat', 'CDefault');
     bb= load('trainingFeatureVectorDefault.mat', 'trainingFeatureVectorDefault');
     handles.trainingFeatureVector = bb.trainingFeatureVectorDefault;
     C = aa.CDefault;
     
-     handles.C = C;
-
+    handles.C = C;
+    
     handles.trainingdata=1;
     
 end
@@ -88,7 +88,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Sign_LanguageTranslator_OutputFcn(hObject, eventdata, handles) 
+function varargout = Sign_LanguageTranslator_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -141,36 +141,31 @@ if ~exist('handles.error_rate')
 end
 
 if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
-   
-            disp('testing')
-            if(handles.extracted ==0)
-            if isempty(handles.trainingFeatureVector)|| isempty(handles.C)
-                errordlg('Empty Set:Extract Feature Vectors First');
-                return
-            else
-                warndlg('Using Default Training Vectors');
-               
-            end
-            end
-       
     
-    %[ Orientation, Eccentricity, Width, Length, Fingers, Knuckles] = descriptor_calc( handles.imageop );
-    %handles.thisx = [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles];
- [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( handles.imageop);
-    %handles.thisx =[ Orientation, Eccentricity, Width, Length, Fingers, Knuckles,real(Fourier_mean),imag(Fourier_mean),real(Fourier_max),imag(Fourier_max),real(Fourier_sigma),imag(Fourier_sigma),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), Fingers, Knuckles];
-
+    disp('testing')
+    if(handles.extracted ==0)
+        if isempty(handles.trainingFeatureVector)|| isempty(handles.C)
+            errordlg('Empty Set:Extract Feature Vectors First');
+            return
+        else
+            warndlg('Using Default Training Vectors');
+            
+        end
+    end
+    
+    
+    %Get Feature Vectors
+    [ Orientation, Eccentricity, Width, Length, Fingers, Knuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( handles.imageop);
+    %Select Feature Vectors
     handles.thisx =[ Orientation, Eccentricity, Width, Length,real(Fourier_max),imag(Fourier_max),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), Fingers, Knuckles];
-
-
-
+    
+    
+    
     % Compute the number of descriptor features.
     % NOTE: Overwrite existing for debugging
     numVectors = max(size(handles.thisx)) / 2;
-    %numVectors = 2;
-    %numVectors = 8;
-
     numVectors = 6;
-
+    
     
     % Update the GUI
     set(handles.textOrientation,'string',Orientation);
@@ -183,17 +178,15 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
     [handles.label handles.corrPlot] = classify( numVectors, handles.trainingFeatureVector, handles.C, handles.thisx ); % , handles.to, handles.t1);
     
     % Update the Output Image
-    [ handles.img handles.outputFile] = getImage( '../imagesPristine/', handles.label );
 
-%     axes(handles.axes7);
-%     imshow(handles.img);
+    [ handles.img handles.outputFile] = getImage( '../imagesPristine/', handles.label );
 
     % Plot the correlation
     %handles.disp = plot(handles.corrPlot,'Parent',handles.axes4);
     axes(handles.axes5);
-     plot( handles.corrPlot,'k*','MarkerSize',5);
-     title('Image Correlation')
-
+    plot( handles.corrPlot,'k*','MarkerSize',5);
+    title('Image Correlation')
+    
     
     % Clear the axes to prevent ghost images overlaying each other
     cla(handles.axes7);
@@ -201,7 +194,7 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
     % Update axes with the pristine image
     axes(handles.axes7);
     imshow(handles.img);
-%     handles.disp = imshow(handles.img,'Parent',handles.axes7);
+
 
 timeElapsed = toc(timeStart);
 
@@ -216,11 +209,14 @@ error = (handles.error_rate / handles.totalRuns ) * 100;
 set(handles.textError, 'String', strcat( num2str(error), ' %') );
 set(handles.textSpeed, 'String', strcat( num2str(timeElapsed), ' seconds') );
 set(handles.text26, 'String', 'Complete!' );
+
     
-elseif handles.data2valid==0  
+    set(handles.text26, 'String', 'Complete!' );
+    
+elseif handles.data2valid==0
     warndlg('Error:No files uploaded');
 elseif handles.extracted == 0
-     warndlg('Error:Please Extract features first');   
+    warndlg('Error:Please Extract features first');
 end
 
 % --- Executes on button press in loadimage.
@@ -275,110 +271,110 @@ handles=guidata(hObject);
 if handles.datavalid~=0
     % Compute the training feature vectors
     [ imageOrientation, imageEccentricity, imageWidth, imageLength, imageFingers, imageKnuckles,Fourier_mean,Fourier_max,Fourier_sigma,Fourier_min,Fourier_dc,Fourier_first] = descriptor_calc( handles.imagestack );
+    % Select desired vectors
     handles.x =[ imageOrientation, imageEccentricity, imageWidth, imageLength,real(Fourier_max),imag(Fourier_max),real(Fourier_min),imag(Fourier_min),real(Fourier_dc),imag(Fourier_dc),real(Fourier_first),imag(Fourier_first), imageFingers, imageKnuckles];
-
-
+    
+    
     
     % Override the NUmber of feature vectors
     numVectors = max(size(handles.x)) / 2;
-    %numVectors = 2;
-    %numVectors = 8;
     numVectors = 6;
-
-
+    
+    
     [ C , handles.XGrid,handles.idx2Region,handles.X] = computeKMeansClusters( numVectors, handles.x );
     handles.C = C;
     [ trainingFeatureVector ] = computeTrainingVector(  numVectors, handles.C, handles.x );
     
-      
-      handles.trainingFeatureVector = trainingFeatureVector;
-%     save('CDefault');
-%     save('trainingFeatureVector');
-
-    % Assigns each node in the grid to the closest centroid    
+    
+    handles.trainingFeatureVector = trainingFeatureVector;
+    %Ran during development to get default vector
+    %     save('CDefault');
+    %     save('trainingFeatureVector');
+    
+    % Assigns each node in the grid to the closest centroid
     
     
-X = [ imageWidth' imageLength'];
-
-% Find the predicted and actual centroid locations
-opts = statset('Display','final');
-[idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
-    'Replicates',5,'Options',opts);
-
-% Defines a fine grid on the plot
-x1 = min(X(:,1)):0.1:max(X(:,1));
-x2 = min(X(:,2)):0.1:max(X(:,2));
-[x1G,x2G] = meshgrid(x1,x2);
-XGrid = [x1G(:),x2G(:)];
-
-idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
-
-% Assigns each node in the grid to the closest centroid    
-axes(handles.axes1);
-gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
-    [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
-hold on;
-plot(X(:,1),X(:,2),'k*','MarkerSize',5);
-title 'Width vs. Length';
-xlabel 'Width (pixels)';
-ylabel 'Length (pixels)';
-legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
-hold off;
+    X = [ imageWidth' imageLength'];
+    
+    % Find the predicted and actual centroid locations
+    opts = statset('Display','final');
+    [idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
+        'Replicates',5,'Options',opts);
+    
+    % Defines a fine grid on the plot
+    x1 = min(X(:,1)):0.1:max(X(:,1));
+    x2 = min(X(:,2)):0.1:max(X(:,2));
+    [x1G,x2G] = meshgrid(x1,x2);
+    XGrid = [x1G(:),x2G(:)];
+    
+    idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
+    
+    % Assigns each node in the grid to the closest centroid
+    axes(handles.axes1);
+    gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
+        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+    hold on;
+    plot(X(:,1),X(:,2),'k*','MarkerSize',5);
+    title 'Width vs. Length';
+    xlabel 'Width (pixels)';
+    ylabel 'Length (pixels)';
+    %legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+    hold off;
     
     
     %Orientation vs Eccentricity
     X = [ imageOrientation' imageEccentricity' ];
-
-% Find the predicted and actual centroid locations
-opts = statset('Display','final');
-[idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
-    'Replicates',5,'Options',opts);
-
-% Defines a fine grid on the plot
-x1 = min(X(:,1)):0.001:max(X(:,1));
-x2 = min(X(:,2)):0.001:max(X(:,2));
-[x1G,x2G] = meshgrid(x1,x2);
-XGrid = [x1G(:),x2G(:)];
-
-idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
-
-% Assigns each node in the grid to the closest centroid    
-axes(handles.axes3);
-gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
-    [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
-hold on;
-plot(X(:,1),X(:,2),'k*','MarkerSize',5);
-title 'Orientation vs. Eccentricity';
-xlabel 'Orientation';
-ylabel 'Eccentricity';
-legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
-hold off;
-
+    
+    % Find the predicted and actual centroid locations
+    opts = statset('Display','final');
+    [idx,C] = kmeans(X,5,'Distance','sqeuclidean',...
+        'Replicates',5,'Options',opts);
+    
+    % Defines a fine grid on the plot
+    x1 = min(X(:,1)):0.001:max(X(:,1));
+    x2 = min(X(:,2)):0.001:max(X(:,2));
+    [x1G,x2G] = meshgrid(x1,x2);
+    XGrid = [x1G(:),x2G(:)];
+    
+    idx2Region = kmeans(XGrid,5,'MaxIter',1,'Start',C);
+    
+    % Assigns each node in the grid to the closest centroid
+    axes(handles.axes3);
+    gscatter(XGrid(:,1),XGrid(:,2),idx2Region,...
+        [0,0.75,0.75;0.75,0,0.75;0.75,0.75,0],'..');
+    hold on;
+    plot(X(:,1),X(:,2),'k*','MarkerSize',5);
+    title 'Orientation vs. Eccentricity';
+    xlabel 'Orientation';
+    ylabel 'Eccentricity';
+    %legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
+    hold off;
+    
     
     % Plot Frequency Domain Derived Descriptors
-axes(handles.axes4);
-plot((real(Fourier_max)),'*')
-hold on
-plot(real(Fourier_min),'o')
-hold on
-plot(real(Fourier_dc),'+')
-hold on
-plot(real(Fourier_first),'v')
-plot((imag(Fourier_max)),'*')
-hold on
-plot(imag(Fourier_min),'o')
-hold on
-plot(imag(Fourier_dc),'+')
-hold on
-plot(imag(Fourier_first),'v');
-legend('x-max','x-min','x-Zero-frequency','x-First Harmonic','y-max','y-min','y-Zero-frequency','y-First Harmonic')
-title('Frequency Domain Descriptors');
+    axes(handles.axes4);
+    plot((real(Fourier_max)),'*')
+    hold on
+    plot(real(Fourier_min),'o')
+    hold on
+    plot(real(Fourier_dc),'+')
+    hold on
+    plot(real(Fourier_first),'v')
+    plot((imag(Fourier_max)),'*')
+    hold on
+    plot(imag(Fourier_min),'o')
+    hold on
+    plot(imag(Fourier_dc),'+')
+    hold on
+    plot(imag(Fourier_first),'v');
+    %legend('x-max','x-min','x-Zero-frequency','x-First Harmonic','y-max','y-min','y-Zero-frequency','y-First Harmonic')
+    title('Frequency Domain Descriptors');
     
     handles.extracted = 1;
     
     %plot ecentricity ish?
 else
-   warndlg('Error:No file uploaded') 
+    warndlg('Error:No file uploaded')
 end
 
 set(handles.text23, 'String', 'Complete!' );
@@ -418,8 +414,8 @@ hEdit = uicontrol(hPan, 'Style','edit', 'FontSize',9, ...
 % jEditbox.setWrapping(false);                %# turn off word-wrapping
 % jEditbox.setEditable(false);                %# non-editable
 % set(jEdit,'HorizontalScrollBarPolicy',30);  %# HORIZONTAL_SCROLLBAR_AS_NEEDED
-% 
-% %# maintain horizontal scrollbar policy which reverts back on component resize 
+%
+% %# maintain horizontal scrollbar policy which reverts back on component resize
 % hjEdit = handle(jEdit,'CallbackProperties');
 % set(hjEdit, 'ComponentResizedCallback',...
 %     'set(gcbo,''HorizontalScrollBarPolicy'',30)')
