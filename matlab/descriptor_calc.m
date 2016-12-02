@@ -177,6 +177,11 @@ for z = 1:numFiles
 %         
 %     end
 
+% Additional Fingertip classification
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% References:
+% https://www.mathworks.com/matlabcentral/fileexchange/32696-2d-line-curvature-and-normals
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %    addpath( './linecurvature_version1b/' );
 %    
 %    sampling = 6;
