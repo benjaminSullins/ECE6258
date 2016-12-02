@@ -183,6 +183,7 @@ if handles.data2valid~=0 &&(handles.extracted == 1 ||handles.trainingdata ==1)
     %handles.disp = plot(handles.corrPlot,'Parent',handles.axes4);
     axes(handles.axes3);
      plot( handles.corrPlot,'k*','MarkerSize',5);
+     title('Correlation')
 
     
     % Clear the axes to prevent ghost images overlaying each other
@@ -281,6 +282,26 @@ if handles.datavalid~=0
     ylabel 'Length (pixels)';
     legend('Region 1','Region 2','Region 3','Region 4','Region 5','Data','Location','SouthEast');
     hold off;
+    
+    
+    % Plot Frequency Domain Derived Descriptors
+axes(handles.axes4);
+plot((real(Fourier_max)),'*')
+hold on
+plot(real(Fourier_min),'o')
+hold on
+plot(real(Fourier_dc),'+')
+hold on
+plot(real(Fourier_first),'v')
+plot((imag(Fourier_max)),'*')
+hold on
+plot(imag(Fourier_min),'o')
+hold on
+plot(imag(Fourier_dc),'+')
+hold on
+plot(imag(Fourier_first),'v');
+legend('x-max','x-min','x-Zero-frequency','x-First Harmonic','y-max','y-min','y-Zero-frequency','y-First Harmonic')
+title('Frequency Domain Descriptors');
     
     handles.extracted = 1;
     

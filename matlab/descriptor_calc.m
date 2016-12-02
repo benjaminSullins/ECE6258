@@ -376,7 +376,8 @@ for i = 1:numFiles
     Fourier_dc(i) =dc;
     Fourier_first(i) = firstharmonic;
     
-toc
+
 
 end
+toc
 
