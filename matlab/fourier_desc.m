@@ -22,7 +22,10 @@ function [ avg, max_coeff ,sigma,min1,dc,firstharmonic ] = fourier_desc( binaryI
  
  %Normalize with zero component for scale invariance
  F_norm = F/abs(F(1));
-
+%  figure;
+% plot(x,y,'o');
+% xlabel('Real Axis')
+% ylabel('Imaginary Axis')
 % figure;
 % plot(x,log(real(F_norm+1)),'r');
 % figure;
